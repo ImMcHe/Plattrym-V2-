@@ -17,6 +17,7 @@ const uint squareInd[]={
 };
 
 #include"Shader.c"
+#include"Buffer.c"
 //#include"Plattrym.c"
 
 const int width=1920,height=1080;
@@ -42,7 +43,12 @@ int main(int argc,char**argv)
 
 	gladLoadGL();
 
-	
+	uint shader=initShaders();
+	uint vao,vbo,ebo;
+	initBuffers(1,&vao,&vbo,&ebo);
+
+	glUseProgram(shader);
+	glBindVertexArray(vao);
 
 	glViewport(0,0,width,height);
 
@@ -51,11 +57,18 @@ int main(int argc,char**argv)
 		glClearColor(0,0,1,1.F);
 		glClear(GL_COLOR_BUFFER_BIT);
 		glfwSwapBuffers(window);
+		glDrawArrays(GL_TRIANGLES,0,4);
 		glfwPollEvents();
 	}
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
+
+	glDeleteProgram(shader);
+	glDeleteBuffers(1,&vao);
+	glDeleteBuffers(1,&vbo);
+	glDeleteBuffers(1,&ebo);
+
     return 0;
 }
 

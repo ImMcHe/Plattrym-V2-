@@ -6,7 +6,18 @@
 #include<stbi/image.h>
 #define uint unsigned int
 
-#include"Plattrym.c"
+const float squareVert[]={
+	-.5,-.5, 0,0,
+	-.5,.5,  0,1,
+	.5,-.5,  1,0,
+	.5,.5,   1,1,
+};
+const uint squareInd[]={
+	0,1,2,1,3,2
+};
+
+#include"Shader.c"
+//#include"Plattrym.c"
 
 const int width=1920,height=1080;
 
@@ -17,9 +28,8 @@ int main(int argc,char**argv)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES,32);
 
-	GLFWwindow*window=glfwCreateWindow(width,height,"Plattrym",glfwGetPrimaryMonitor(),NULL);
+	GLFWwindow*window=glfwCreateWindow(width,height,"Plattrym (V2)",glfwGetPrimaryMonitor(),NULL);
 
 	if(window==NULL)
 	{

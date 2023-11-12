@@ -12,7 +12,6 @@ inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
 	glGenBuffers(1,&ebo);
 
 	//mallocs the temp indices
-	
 	const float indLen=sizeof(squareInd)/sizeof(float);
 	uint*tmpInd=(uint*)malloc(sz*sizeof(squareInd));
 	for(size_t i=0;i<sz;i++)

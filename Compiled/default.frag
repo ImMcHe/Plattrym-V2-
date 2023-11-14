@@ -1,7 +1,9 @@
 #version 330 core
 out vec4 fragColor;
+in vec2 textCoord;
+uniform sampler2D mainTex;
 
 void main()
 {
-	fragColor=vec4(.8F,.3F,.02F,1.F);
+	fragColor=texture(mainTex,textCoord);
 }

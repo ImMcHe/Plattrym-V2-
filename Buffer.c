@@ -4,7 +4,7 @@
 
 #include<stdlib.h>
 
-inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
+static inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
 {
 	uint vao,vbo,ebo;
 	glGenVertexArrays(1,&vao);
@@ -12,17 +12,19 @@ inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
 	glGenBuffers(1,&ebo);
 
 	//mallocs the temp indices
-	const float indLen=sizeof(squareInd)/sizeof(float);
+	const size_t indLen=sizeof(squareInd)/sizeof(float);
 	uint*tmpInd=(uint*)malloc(sz*sizeof(squareInd));
 	for(size_t i=0;i<sz;i++)
 		for(size_t j=0;j<indLen;j++)
 			tmpInd[i*indLen+j]=squareInd[j]+i*indLen;
 
 	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER,vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sz*sizeof(squareInd),tmpInd,GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0,sz*4,GL_FLOAT,0,4*sizeof(float),(void*)0);
+	glVertexAttribPointer(0,2,GL_FLOAT,0,4*sizeof(float),(void*)0);
+	glVertexAttribPointer(1,2,GL_FLOAT,0,4*sizeof(float),(void*)(2*sizeof(float)));
 	glEnableVertexAttribArray(0);
 
 	*vao_p=vao;
@@ -31,6 +33,13 @@ inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
 
 	//frees the temp indices
 	free(tmpInd);
+
+	glBindBuffer(GL_ARRAY_BUFFER,vbo);
+}
+
+static inline void bufferData(size_t sz,const float*data)
+{
+	glBufferData(GL_ARRAY_BUFFER,sz*sizeof(squareVert),data,GL_STATIC_DRAW);
 }
 
 #endif

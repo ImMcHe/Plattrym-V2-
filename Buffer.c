@@ -20,12 +20,14 @@ static inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
+	glBufferData(GL_ARRAY_BUFFER,sz*sizeof(squareVert),(float*)0,GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,sz*sizeof(squareInd),tmpInd,GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0,2,GL_FLOAT,0,4*sizeof(float),(void*)0);
-	glVertexAttribPointer(1,2,GL_FLOAT,0,4*sizeof(float),(void*)(2*sizeof(float)));
 	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(1,2,GL_FLOAT,0,4*sizeof(float),(void*)(2*sizeof(float)));
+	glEnableVertexAttribArray(1);
 
 	*vao_p=vao;
 	*vbo_p=vbo;
@@ -35,11 +37,6 @@ static inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
 	free(tmpInd);
 
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);
-}
-
-static inline void bufferData(size_t sz,const float*data)
-{
-	glBufferData(GL_ARRAY_BUFFER,sz*sizeof(squareVert),data,GL_STATIC_DRAW);
 }
 
 #endif

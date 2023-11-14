@@ -39,6 +39,24 @@ static inline uint initShaders()
 	glShaderSource(fragS,1,&frag,NULL);
 	glCompileShader(fragS);
 
+	int bruh=0;
+	glGetShaderiv(vertS,GL_COMPILE_STATUS,&bruh);
+	if(!bruh)
+	{
+		printf("Unable to compile default.vert\n");
+		glfwSetWindowShouldClose(window,1);
+		getch();
+		exit(-1);
+	}
+	glGetShaderiv(fragS,GL_COMPILE_STATUS,&bruh);
+	if(!bruh)
+	{
+		printf("Unable to compile default.frag\n");
+		glfwSetWindowShouldClose(window,1);
+		getch();
+		exit(-1);
+	}
+
 	uint pgm=glCreateProgram();
 	glAttachShader(pgm,vertS);
 	glAttachShader(pgm,fragS);

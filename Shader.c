@@ -66,6 +66,14 @@ static inline uint initShaders()
 	glDeleteShader(vertS);
 	glDeleteShader(fragS);
 
+	int sx=SCREEN_X,sy=SCREEN_Y;
+	char isXBigger=sx>sy;
+	float xdy=(float)sx/(float)sy;
+	float ydx=(float)sy/(float)sx;
+
+	//make the window FIT IN.
+	glUniform2f(glGetUniformLocation(pgm,"sc"),isXBigger?ydx:1.F,isXBigger?1.F:xdy);
+
 	return pgm;
 }
 

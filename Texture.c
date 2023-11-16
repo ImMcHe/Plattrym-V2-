@@ -25,7 +25,6 @@ static inline void initTextures(uint shaderId)
 	//Otherwise we are all gonna go down there :sob:
 	stbi_set_flip_vertically_on_load(1);
 	bytes=stbi_load("main.png",&w,&h,&numColCh,4);
-	bytes[1]=0;
 
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,bytes);
 	glGenerateMipmap(GL_TEXTURE_2D);

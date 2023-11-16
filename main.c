@@ -17,11 +17,22 @@ const float squareVert[]={
 const uint squareInd[]={
 	0,1,2,1,3,2
 };
-size_t sz=1;
+const size_t scSize=(39*2+1)*(21*2+1);
+const size_t sz=(39*2+1)*(21*2+1);
+uint scaleLocation;
 float*vertecies;
 
 double deltaTime;
 clock_t timeBef;
+static inline float getTextCoordX(char type)
+{
+	return type%4;
+}
+static inline float getTextCoordY(char type)
+{
+	return type/4;
+}
+
 
 const float width=1920/1920.F,height=1080/1920.F;
 #define SCREEN_X GetSystemMetrics(SM_CXSCREEN)
@@ -37,14 +48,15 @@ const float width=1920/1920.F,height=1080/1920.F;
 
 static inline void update()
 {
-	for(int i=0;i<(sizeof(squareVert)/sizeof(float));i++)
-		vertecies[i]=squareVert[i];
-	if(getKeyDown(GLFW_KEY_LEFT))
-		for(int i=0;i<(sizeof(squareVert)/sizeof(float));i++)
-			vertecies[i]=squareVert[i]+.5F;
-	if(getKeyDown(GLFW_KEY_RIGHT))
-		for(int i=0;i<(sizeof(squareVert)/sizeof(float));i++)
-			vertecies[i]=squareVert[i]-.5F;
+	glUniform2f(scaleLocation,.1F,.1F);
+	for(int x=0;x<=78;x++)
+		for(int y=0;y<=42;y++)
+		{
+			vertecies[y*79+x]=squareVert[0]+x;
+			vertecies[y*79+x]=squareVert[1]+y;
+			vertecies[y*79+x]=squareVert[2]+getTextCoordX(*getMap(x,y));
+			vertecies[y*79+x]=squareVert[3]+getTextCoordY(*getMap(x,y));
+		}
 }
 
 
@@ -78,7 +90,7 @@ int main(int argc,char**argv)
 	printf("Loadint Shaders...\n");
 	uint shader=initShaders();
 	printf("Loading Buffers...\n");
-	initBuffers(1,&vao,&vbo,&ebo);
+	initBuffers(sz,&vao,&vbo,&ebo);
 	printf("Loadint Textures...\n");
 	initTextures(shader);
 	printf("Done!\n");

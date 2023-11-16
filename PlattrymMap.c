@@ -5,7 +5,15 @@
 
 uint mapW,mapH;
 char*map,isMallocedMap=0;
-const char AIR=0,GRASS=1,DIRT=2,STONE=3,WHITESTONE=4,ORE=5,DIAMOND=6,GRAVEL=7,PURPLE=8;
+#define AIR 0
+#define GRASS 1
+#define DIRT 2
+#define STONE 3
+#define WHITESTONE 4
+#define ORE 5
+#define DIAMOND 6
+#define GRAVEL 7
+#define PURPLE 8
 
 static inline float getBlr(char type)
 {
@@ -37,7 +45,9 @@ static inline float getBlr(char type)
 
 static inline char*getMap(uint x,uint y)
 {
-	return map+(x*mapH+y);
+	if(y<0||y>=mapH)
+		return AIR;
+	return map+((x%mapW+mapW)%mapW*mapH+y);
 }
 
 

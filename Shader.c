@@ -72,6 +72,7 @@ static inline uint initShaders()
 	float ydx=(float)sy/(float)sx;
 
 	//make the window FIT IN.
+	scaleLocation=glGetUniformLocation(pgm,"sg");
 	glUniform2f(glGetUniformLocation(pgm,"sc"),isXBigger?ydx:1.F,isXBigger?1.F:xdy);
 
 	return pgm;

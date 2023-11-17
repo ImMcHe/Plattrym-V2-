@@ -46,7 +46,7 @@ static inline float getBlr(char type)
 static inline char*getMap(uint x,uint y)
 {
 	if(y<0||y>=mapH)
-		return AIR;
+		return map+(mapW*mapH+1);
 	return map+((x%mapW+mapW)%mapW*mapH+y);
 }
 
@@ -55,7 +55,8 @@ static inline void mallocMap(uint mapWidth,uint mapHeight)
 {
 	if(isMallocedMap)
 		isMallocedMap=0,free(map);
-	map=(char*)malloc(mapWidth*mapHeight);
+	map=(char*)malloc(mapWidth*mapHeight+1);
+	memset(map,0,mapWidth*mapHeight+1);
 	mapW=mapWidth,mapH=mapHeight;
 	isMallocedMap=1;
 }
@@ -66,7 +67,7 @@ static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSp
 	mallocMap(mapWidth,mapHeight);
 	int curHeight=-1;
 	int curHeightCh=0;
-	for(uint x=mapWidth/2;x<mapWidth;x++)
+	for(uint x=0;x<mapWidth/2;x++)
 	{
 		for(uint y=0;y<mapHeight;y++)
 		{
@@ -89,6 +90,7 @@ static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSp
 			//Grass spawn simulation
 			if(y==curHeight+mapHeight)
 				*getMap(x,y)=GRASS;
+			*getMap(mapWidth-x-1,y)=*getMap(x,y);
 		}
 		if(curHeight>-1)
 			curHeight=-1,curHeightCh=-1;

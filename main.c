@@ -19,18 +19,18 @@ const uint squareInd[]={
 };
 const size_t scSize=(39*2+1)*(21*2+1);
 const size_t sz=(39*2+1)*(21*2+1);
-uint scaleLocation;
+uint scaleLocation,positionLocation;
 float*vertecies;
 
 double deltaTime;
 clock_t timeBef;
 static inline float getTextCoordX(char type)
 {
-	return type%4;
+	return type%4*.25F;
 }
 static inline float getTextCoordY(char type)
 {
-	return type/4;
+	return .75F-type*.25F;
 }
 
 
@@ -48,15 +48,22 @@ const float width=1920/1920.F,height=1080/1920.F;
 
 static inline void update()
 {
-	glUniform2f(scaleLocation,.1F,.1F);
-	for(int x=0;x<=78;x++)
-		for(int y=0;y<=42;y++)
-		{
-			vertecies[y*79+x]=squareVert[0]+x;
-			vertecies[y*79+x]=squareVert[1]+y;
-			vertecies[y*79+x]=squareVert[2]+getTextCoordX(*getMap(x,y));
-			vertecies[y*79+x]=squareVert[3]+getTextCoordY(*getMap(x,y));
-		}
+	glUniform2f(scaleLocation,.05F,.05F);
+	glUniform2f(positionLocation,cx,-cy);
+
+	playerUpdate(deltaTime);
+
+	for(size_t x=0;x<=78;x++)
+		for(size_t y=0;y<=42;y++)
+			for(size_t i=0;i<16;i+=4)
+			{
+				size_t idx=(y*79+x)*16+i;
+				char mapTy=*getMap(x-36,y-21);
+				vertecies[idx]=squareVert[i]+x;
+				vertecies[idx+1]=squareVert[i+1]+y;
+				vertecies[idx+2]=squareVert[i+2]*.25F+getTextCoordX(mapTy);
+				vertecies[idx+3]=squareVert[i+3]*.25F+getTextCoordY(mapTy);
+			}
 }
 
 

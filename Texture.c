@@ -27,7 +27,6 @@ static inline void initTextures(uint shaderId)
 	bytes=stbi_load("main.png",&w,&h,&numColCh,4);
 
 	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,w,h,0,GL_RGBA,GL_UNSIGNED_BYTE,bytes);
-	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glUseProgram(shaderId);
 	glUniform1i(textuni,0);

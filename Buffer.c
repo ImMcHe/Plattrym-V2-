@@ -12,11 +12,10 @@ static inline void initBuffers(size_t sz,uint*vao_p,uint*vbo_p,uint*ebo_p)
 	glGenBuffers(1,&ebo);
 
 	//mallocs the temp indices
-	const size_t indLen=sizeof(squareInd)/sizeof(float);
 	uint*tmpInd=(uint*)malloc(sz*sizeof(squareInd));
 	for(size_t i=0;i<sz;i++)
-		for(size_t j=0;j<indLen;j++)
-			tmpInd[i*indLen+j]=squareInd[j]+i*indLen;
+		for(size_t j=0;j<6;j++)
+			tmpInd[i*6+j]=squareInd[j]+i*4;
 
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER,vbo);

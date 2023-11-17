@@ -3,7 +3,7 @@
 #define __PLATTRYM_MAP__
 
 
-uint mapW,mapH;
+int mapW,mapH;
 char*map,isMallocedMap=0;
 #define AIR 0
 #define GRASS 1
@@ -43,7 +43,7 @@ static inline float getBlr(char type)
 }
 
 
-static inline char*getMap(uint x,uint y)
+static inline char*getMap(int x,int y)
 {
 	if(y<0||y>=mapH)
 		return map+(mapW*mapH+1);
@@ -53,6 +53,7 @@ static inline char*getMap(uint x,uint y)
 
 static inline void mallocMap(uint mapWidth,uint mapHeight)
 {
+	srand(clock());
 	if(isMallocedMap)
 		isMallocedMap=0,free(map);
 	map=(char*)malloc(mapWidth*mapHeight+1);
@@ -79,23 +80,25 @@ static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSp
 					rand()%2?
 						DIAMOND:
 						PURPLE:
-					rand()%oreSpawnRate?
+					0==rand()%oreSpawnRate?
 					ORE:
-					rand()%gravelSpawnRate?
+					0==rand()%gravelSpawnRate?
 					GRAVEL:
 					STONE;
 			//Dirt spawn simulation
-			if(y<curHeight+mapHeight)
+			else if(y<curHeight+mapHeight)
 				*getMap(x,y)=rand()%gravelSpawnRate==0?GRAVEL:DIRT;
 			//Grass spawn simulation
-			if(y==curHeight+mapHeight)
+			else if(y==curHeight+mapHeight)
 				*getMap(x,y)=GRASS;
+			else
+				*getMap(x,y)=AIR;
 			*getMap(mapWidth-x-1,y)=*getMap(x,y);
 		}
-		if(curHeight>-1)
-			curHeight=-1,curHeightCh=-1;
 		curHeightCh=(curHeightCh<0?-1:curHeightCh==0?rand()?1:-1:1)*(rand()%(abs(curHeightCh)+1)==0?abs(curHeightCh)+1:abs(curHeightCh)-1);
 		curHeight+=curHeightCh;
+		if(curHeight>-1)
+			curHeight=-1,curHeightCh=-1;
 	}
 }
 

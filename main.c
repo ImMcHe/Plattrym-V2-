@@ -30,7 +30,7 @@ static inline float getTextCoordX(char type)
 }
 static inline float getTextCoordY(char type)
 {
-	return .75F-type*.25F;
+	return .75F-(type/4)*.25F;
 }
 
 
@@ -53,14 +53,14 @@ static inline void update()
 
 	playerUpdate(deltaTime);
 
-	for(size_t x=0;x<=78;x++)
-		for(size_t y=0;y<=42;y++)
+	for(int x=0;x<=78;x++)
+		for(int y=0;y<=42;y++)
 			for(size_t i=0;i<16;i+=4)
 			{
 				size_t idx=(y*79+x)*16+i;
-				char mapTy=*getMap(x-36,y-21);
-				vertecies[idx]=squareVert[i]+x;
-				vertecies[idx+1]=squareVert[i+1]+y;
+				char mapTy=*getMap(x-36-(int)round(cx),y-21+(int)round(cy));
+				vertecies[idx]=squareVert[i]+x-(float)round(cx)-36.F;
+				vertecies[idx+1]=squareVert[i+1]+y+(float)round(cy)-21.F;
 				vertecies[idx+2]=squareVert[i+2]*.25F+getTextCoordX(mapTy);
 				vertecies[idx+3]=squareVert[i+3]*.25F+getTextCoordY(mapTy);
 			}
@@ -115,13 +115,13 @@ int main(int argc,char**argv)
 	timeBef=clock();
 
 	//Generate Plattrym
-	generateMapNormal(500,500,300,100,20,41,25);
+	generateMapNormal(500,500,150,300,30,41,25);
 
 	while(!glfwWindowShouldClose(window))
 	{
 		//DeltaTime
 		clock_t curTime=clock();
-		deltaTime=(curTime-timeBef)*.001;
+		deltaTime=min(1.,(curTime-timeBef)*.001);
 		timeBef=curTime;
 
 		update();

@@ -23,51 +23,41 @@ char*map,isMallocedMap=0;
 #define HARDICE 16
 #define HARDVALLEY 17
 #define NORMALGRAVEL 18
+#define ICEORE 23
+#define VALLEYORE 24
+#define NORMALORE 25
+const float blr[]={
+	.41,
+	2.,
+	1.,
+	1.674,
+	11.24,
+	2.225,
+	3.6,
+	.01,
+	-2.,
+	.4,
+	.6,
+	3.1,
+	1.36,
+	2.12,
+	1.34,
+	1.,
+	1.91,
+	2.51,
+	.05,
+	1.,1.,1.,1.,
+	3.,
+	4.,
+	3.1
+};
 
 
 static inline float getBlr(char type)
 {
-	switch(type)
-	{
-	case AIR:
-		return.41F;
-	case GRASS:
-		return 2.F;
-	case DIRT:
-		return 1.F;
-	case STONE:
-		return 1.674F;
-	case WHITESTONE:
-		return 6.768F;
-	case ORE:
-		return 2.225F;
-	case DIAMOND:
-		return 3.2F;
-	case GRAVEL:
-		return.1F;
-	case PURPLE:
-		return-2.F;
-	case SNOW:
-		return.8F;
-	case ICE:
-		return 1.5F;
-	case HARDICE:
-		return 1.85F;
-	case VALLEYGRASS:
-		return 3.1F;
-	case VALLEYDIRT:
-		return 1.34F;
-	case HARDVALLEY:
-		return 2.12F;
-	case NORMALGRASS:
-		return 2.05F;
-	case NORMALDIRT:
-		return 1.05F;
-	case NORMALGRAVEL:
-		return.15F;
-	default:
-		return 1.F;
-	}
+	if(type<26)
+		return blr[type];
+	return 1.F;
 }
 
 
@@ -91,11 +81,11 @@ static inline void mallocMap(uint mapWidth,uint mapHeight)
 }
 
 
-static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSpawnHeight,uint dirtHeight,uint gravelSpawnRate,uint diamondSpawnRate,uint oreSpawnRate)
+static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSpawnHeight,uint dirtHeight,uint gravelSpawnRate,uint diamondSpawnRate,uint oreSpawnRate,uint specialOreSpawnRate)
 {
 	mallocMap(mapWidth,mapHeight);
-	//int curHeight=-250;
-	int curHeight=-1000;
+	int curHeight=-250;
+	//int curHeight=-500;
 	int curHeightCh=0;
 	char mapType=rand()%4;
 
@@ -129,8 +119,7 @@ static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSp
 	for(uint x=0;x<mapWidth;x++)
 	{
 		//printf("%i %i\n",mapHeights[x],biomes[x]);
-		printf("%i\n",mapHeights[x]+(int)dirtHeight+rand()%20-10);
-		for(uint y=0;y<mapHeight;y++)
+		for(int y=0;y<mapHeight;y++)
 		{
 			int curHeight=mapHeights[x];
 			int rndShift=0;
@@ -149,6 +138,8 @@ static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSp
 						PURPLE:
 					0==rand()%oreSpawnRate?
 					ORE:
+					0==rand()%specialOreSpawnRate&&mapType!=0?
+					(mapType==1?ICEORE:mapType==2?VALLEYORE:mapType==3?NORMALORE:AIR):
 					0==rand()%gravelSpawnRate?
 					GRAVEL:
 					STONE;

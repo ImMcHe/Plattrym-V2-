@@ -17,8 +17,7 @@ const float squareVert[]={
 const uint squareInd[]={
 	0,1,2,1,3,2
 };
-const size_t scSize=(78*2+1)*(42*2+1);
-const size_t sz=(78*2+1)*(42*2+1);
+#define scSize 13345
 uint scaleLocation,positionLocation;
 float*vertecies;
 
@@ -40,15 +39,19 @@ const float width=1920/1920.F,height=1080/1920.F;
 #define getKeyDown(__keyCode__)(glfwGetKey(window,__keyCode__)==GLFW_PRESS)
 
 
+#include"Plattrym.c"
+
+
+const size_t sz=scSize+bombMaxLen;
 #include"Shader.c"
 #include"Buffer.c"
 #include"Texture.c"
-#include"Plattrym.c"
 
 
 static inline void update()
 {
-	glUniform2f(scaleLocation,.03F,.03F);
+	//glUniform2f(scaleLocation,.03F,.03F);
+	glUniform2f(scaleLocation,.01F,.01F);
 	glUniform2f(positionLocation,cx,-cy);
 
 	playerUpdate(deltaTime);
@@ -59,12 +62,37 @@ static inline void update()
 			{
 				size_t idx=(y*157+x)*16+i;
 				char mapTy=*getMap(x-78-(int)round(cx),y-42+(int)round(cy));
-				vertecies[idx]=squareVert[i]+x-(float)round(cx)-78.F;
-				vertecies[idx+1]=squareVert[i+1]+y+(float)round(cy)-42.F;
+				vertecies[idx]=mapTy?squareVert[i]+x-(float)round(cx)-78.F:0;
+				vertecies[idx+1]=mapTy?squareVert[i+1]+y+(float)round(cy)-42.F:0;
 				vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
 				vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
 			}
+	for(int x=0;x<bombLen;x++)
+		for(size_t i=0;i<16;i+=4)
+		{
+			//printf("BRUH");
+			size_t idx=(scSize+x)*16+i;
+			char mapTy=bombs[x].type;
+			//vertecies[idx]=squareVert[i]+bombs[x].xPos;
+			//vertecies[idx+1]=squareVert[i]+(float)bombs[x].yPos;
+			vertecies[idx]=squareVert[i];
+			vertecies[idx+1]=squareVert[i];
+			//printf("%f %f\n",vertecies[idx],vertecies[idx+1]);
+			vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
+			vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
+		}
+	for(int x=bombLen;x<bombMaxLen;x++)
+		for(size_t i=0;i<16;i+=4)
+		{
+			size_t idx=(scSize+x)*16+i;
+			vertecies[idx]=0.F;
+			vertecies[idx+1]=0.F;
+			vertecies[idx+2]=0.F;
+			vertecies[idx+3]=0.F;
+		}
 }
+
+
 
 
 int main(int argc,char**argv)
@@ -115,7 +143,7 @@ int main(int argc,char**argv)
 	timeBef=clock();
 
 	//Generate Plattrym
-	generateMapNormal(2000,1500,300,600,30,41,25);
+	generateMapNormal(2000,2000,600,1300,30,41,25,51);
 
 	while(!glfwWindowShouldClose(window))
 	{

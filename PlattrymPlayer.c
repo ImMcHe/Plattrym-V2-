@@ -20,8 +20,10 @@ static inline void fixedUpdate()
 		cy-=.3;
 	char isPress=getKeyDown(GLFW_KEY_SPACE);
 	if(isPress&&!isBlastDown)
-		explode(cx,cy,getBlastPower(BIGBOMB));
+		explode(cx,cy,getBlastPower(SMALLBOMB));
 	isBlastDown=isPress;
+
+	bombUpdate();
 }
 
 

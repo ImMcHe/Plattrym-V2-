@@ -3,7 +3,7 @@
 #define __PLATTRYM__
 
 #include"PlattrymMap.c"
-#include"PlattrymPlayer.c"
 #include"PlattrymBomb.c"
+#include"PlattrymPlayer.c"
 
 #endif

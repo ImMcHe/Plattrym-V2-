@@ -10,9 +10,9 @@
 GLFWwindow*window;
 const float squareVert[]={
 	-.5,-.5, 0,0,
-	-.5,.5,  0,1,
-	.5,-.5,  1,0,
-	.5,.5,   1,1,
+	-.5,.5,  0,.95,
+	.5,-.5,  .95,0,
+	.5,.5,   .95,.95,
 };
 const uint squareInd[]={
 	0,1,2,1,3,2
@@ -26,11 +26,11 @@ double deltaTime;
 clock_t timeBef;
 static inline float getTextCoordX(char type)
 {
-	return type%8*.125F;
+	return type%8*.125F+.001F;
 }
 static inline float getTextCoordY(char type)
 {
-	return .875F-(type/8)*.125F;
+	return .875F-(type/8)*.125F+.001F;
 }
 
 
@@ -58,7 +58,7 @@ static inline void update()
 			for(size_t i=0;i<16;i+=4)
 			{
 				size_t idx=(y*157+x)*16+i;
-				char mapTy=*getMap(x-36-(int)round(cx),y-21+(int)round(cy));
+				char mapTy=*getMap(x-78-(int)round(cx),y-42+(int)round(cy));
 				vertecies[idx]=squareVert[i]+x-(float)round(cx)-78.F;
 				vertecies[idx+1]=squareVert[i+1]+y+(float)round(cy)-42.F;
 				vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
@@ -115,7 +115,7 @@ int main(int argc,char**argv)
 	timeBef=clock();
 
 	//Generate Plattrym
-	generateMapNormal(2000,1000,300,600,30,41,25);
+	generateMapNormal(2000,1500,300,600,30,41,25);
 
 	while(!glfwWindowShouldClose(window))
 	{

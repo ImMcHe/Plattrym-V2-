@@ -2,19 +2,21 @@
 #ifndef __PLATTRYM_PLAYER__
 #define __PLATTRYM_PLAYER__
 
+#define PLAYER 15
+
 double px,py,cx,cy,prevDeltaTime;
 
 
 static inline void fixedUpdate()
 {
 	if(getKeyDown(GLFW_KEY_LEFT))
-		cx+=.1;
+		cx+=.3;
 	if(getKeyDown(GLFW_KEY_RIGHT))
-		cx-=.1;
+		cx-=.3;
 	if(getKeyDown(GLFW_KEY_UP))
-		cy+=.1;
+		cy+=.3;
 	if(getKeyDown(GLFW_KEY_DOWN))
-		cy-=.1;
+		cy-=.3;
 }
 
 

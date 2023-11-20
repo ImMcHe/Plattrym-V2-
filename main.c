@@ -10,9 +10,9 @@
 GLFWwindow*window;
 const float squareVert[]={
 	-.5,-.5, 0,0,
-	-.5,.5,  0,.95,
-	.5,-.5,  .95,0,
-	.5,.5,   .95,.95,
+	-.5,.5,  0,.98,
+	.5,-.5,  .98,0,
+	.5,.5,   .98,.98,
 };
 const uint squareInd[]={
 	0,1,2,1,3,2
@@ -50,19 +50,20 @@ const size_t sz=scSize+bombMaxLen;
 
 static inline void update()
 {
-	//glUniform2f(scaleLocation,.03F,.03F);
-	glUniform2f(scaleLocation,.01F,.01F);
-	glUniform2f(positionLocation,cx,-cy);
+	playerUpdate(getKeyDown(GLFW_KEY_K)?deltaTime*.1:deltaTime);
 
-	playerUpdate(deltaTime);
+	glUniform2f(scaleLocation,-.03F,.03F);
+	//glUniform2f(scaleLocation,-.02F,.02F);
+	glUniform2f(positionLocation,-cx,-cy);
+
 
 	for(int x=0;x<=156;x++)
 		for(int y=0;y<=84;y++)
 			for(size_t i=0;i<16;i+=4)
 			{
 				size_t idx=(y*157+x)*16+i;
-				char mapTy=*getMap(x-78-(int)round(cx),y-42+(int)round(cy));
-				vertecies[idx]=mapTy?squareVert[i]+x-(float)round(cx)-78.F:0;
+				char mapTy=*getMap(x-78+(int)round(cx),y-42+(int)round(cy));
+				vertecies[idx]=mapTy?squareVert[i]+x+(float)round(cx)-78.F:0;
 				vertecies[idx+1]=mapTy?squareVert[i+1]+y+(float)round(cy)-42.F:0;
 				vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
 				vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
@@ -73,10 +74,10 @@ static inline void update()
 			//printf("BRUH");
 			size_t idx=(scSize+x)*16+i;
 			char mapTy=bombs[x].type;
-			//vertecies[idx]=squareVert[i]+bombs[x].xPos;
-			//vertecies[idx+1]=squareVert[i]+(float)bombs[x].yPos;
-			vertecies[idx]=squareVert[i];
-			vertecies[idx+1]=squareVert[i];
+			vertecies[idx]=squareVert[i]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:bombs[x].fuse*.05F))+(bombs[x].xPos+(bombs[x].xPos>cx+mapW*.5?-mapW:bombs[x].xPos<cx-mapW*.5?mapW:0));
+			vertecies[idx+1]=squareVert[i+1]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:bombs[x].fuse*.05F))+(float)bombs[x].yPos;
+			//vertecies[idx]=squareVert[i];
+			//vertecies[idx+1]=squareVert[i+1];
 			//printf("%f %f\n",vertecies[idx],vertecies[idx+1]);
 			vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
 			vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);

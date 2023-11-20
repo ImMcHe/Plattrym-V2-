@@ -16,6 +16,7 @@ struct Bomb
 	char type;
 	double yPos;
 	int xPos;
+	int fuse;
 }
 bombs[bombMaxLen];
 struct Particle
@@ -31,6 +32,7 @@ static inline struct Bomb spawnBomb(char type,int xPos,double yPos)
 	bomb.type=type;
 	bomb.xPos=xPos;
 	bomb.yPos=yPos;
+	bomb.fuse=-1;
 	return bomb;
 }
 static inline struct Particle spawnParticle(char type,double rotation,double xPos,double yPos)
@@ -80,28 +82,26 @@ static inline void destroy(int xPos,int yPos,float*power,float damage,float mult
 }
 
 
-static inline void explode(int xPos,int yPos,float power)
+static inline void explodeFwd(int xPos,int yPos,float power,float damage)
 {
-	xPos=-xPos;
-	float damage=0;
 	destroy(xPos,yPos,&power,damage,.25F);
 	float pl=power,pr=power;
 	int i=0;
-	while(pl>0.F&&pr>0.F)
+	while(pl>0.F||pr>0.F)
 	{
 		i++;
 		destroy(xPos,yPos+i,&pl,damage,1.F);
 		destroy(xPos,yPos-i,&pr,damage,1.F);
 	}
 	pl=power;pr=power;i=0;
-	while(pl>0.F&&pr>0.F)
+	while(pl>0.F||pr>0.F)
 	{
 		i++;
 		destroy(xPos+i,yPos,&pl,damage,1.F);
 		destroy(xPos-i,yPos,&pr,damage,1.F);
 		float pl1=pl,pl2=pl,pr1=pr,pr2=pr;
 		int j=0;
-		while(pl1>0.F&&pl2>0.F&&pr1>0.F&&pr2>0.F)
+		while(pl1>0.F||pl2>0.F||pr1>0.F||pr2>0.F)
 		{
 			j++;
 			destroy(xPos+i,yPos+j,&pl1,damage,1.F);
@@ -112,11 +112,23 @@ static inline void explode(int xPos,int yPos,float power)
 	}
 }
 
+static inline void explode(int xPos,int yPos,char type)
+{
+	if(type==ABOMB)
+	{
+		explodeFwd(xPos,yPos,getBlastPower(ABOMB),.5F);
+		explodeFwd(xPos,yPos,getBlastPower(ABOMB),.5F);
+		return;
+	}
+	explodeFwd(xPos,yPos,getBlastPower(type),1.F);
+	return;
+}
+
 
 static inline void bombUpdate()
 {
-	//bombSpawnChance+=.01;
-	bombSpawnChance+=100.;
+	bombSpawnChance+=.01;
+	//bombSpawnChance+=100.;
 	double newChance=pow(bombSpawnChance,.8);
 
 	if(
@@ -127,15 +139,44 @@ static inline void bombUpdate()
 		double randChance=rand()/(double)RAND_MAX*100.;
 		int width=rand()/(double)RAND_MAX*mapW;
 		//double height=mapH;
-		double height=0;
+		double height=mapH+100.;
 
-		bombs[bombLen++]=spawnBomb((randChance<46.?SMALLBOMB:randChance<73.?MIDBOMB:BIGBOMB),width,height);
+		bombs[bombLen++]=spawnBomb(
+			(randChance<46.?SMALLBOMB:randChance<77.?MIDBOMB:BIGBOMB),
+			width,
+			height
+		);
 	}
-	if(rand()==0&&bombLen<bombMaxLen)
+	if((rand()==0||getKeyDown(GLFW_KEY_SPACE))&&bombLen<bombMaxLen)
 	{
 		int width=rand()/(double)RAND_MAX*mapW;
 		double height=mapH;
+
+		bombs[bombLen++]=spawnBomb(
+			ABOMB,
+			width,
+			height
+		);
 	}
+	
+	for(uint i=0;i<bombLen;i++)
+	{
+		bombs[i].yPos-=(bombs[i].type==SMALLBOMB?.1:bombs[i].type==MIDBOMB?.09:bombs[i].type==BIGBOMB?.07:.009);
+		if(bombs[i].fuse!=-1)
+			bombs[i].fuse+=1;
+		else if(*getMap(bombs[i].xPos,round(bombs[i].yPos)))
+			bombs[i].fuse=0;
+	}
+
+	int shiftW=0;
+	for(int i=0;i<bombLen;i++)
+	{
+		char type=bombs[i].type;
+		if(bombs[i].yPos<-50||bombs[i].fuse>=(type==SMALLBOMB?8:type==MIDBOMB?10:type==BIGBOMB?13:50))
+			shiftW++,explode(bombs[i].xPos,round(bombs[i].yPos),type);
+		bombs[i]=bombs[i+shiftW];
+	}
+	bombLen-=shiftW;
 }
 
 #endif

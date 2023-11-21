@@ -17,7 +17,7 @@ const float squareVert[]={
 const uint squareInd[]={
 	0,1,2,1,3,2
 };
-#define scSize 13345
+#define scSize 21037
 uint scaleLocation,positionLocation;
 float*vertecies;
 
@@ -42,7 +42,7 @@ const float width=1920/1920.F,height=1080/1920.F;
 #include"Plattrym.c"
 
 
-const size_t sz=scSize+bombMaxLen;
+const size_t sz=1+scSize+bombMaxLen+particleMaxLen+powerUpMaxLen;
 #include"Shader.c"
 #include"Buffer.c"
 #include"Texture.c"
@@ -50,29 +50,59 @@ const size_t sz=scSize+bombMaxLen;
 
 static inline void update()
 {
-	playerUpdate(getKeyDown(GLFW_KEY_K)?deltaTime*.1:deltaTime);
+	playerUpdate(!getKeyDown(GLFW_KEY_K)?deltaTime*.01:deltaTime);
 
-	glUniform2f(scaleLocation,-.03F,.03F);
-	//glUniform2f(scaleLocation,-.02F,.02F);
+	float dist=pow((cx-scx)*(cx-scx)+(cy-scy)*(cy-scy)+49.,.3)*.06+1.;
+	glUniform2f(scaleLocation,-.03F/dist,.03F/dist);
+	//glUniform2f(scaleLocation,-.01F,.01F);
 	glUniform2f(positionLocation,-cx,-cy);
 
+	// --- Clear Color ---
+	float colR=0.F,colG=0.F,colB=0.F;
+	for(int i=-50;i<51;i++)
+	{
+		//printf("%i\n",((i+(int)floor(cx))%mapW+mapW)%mapW);
+		char biome=biomes[((i+(int)floor(cx))%mapW+mapW)%mapW];
+		float ratio=(i==-20?fmod(cx,1):i==20?1.-fmod(cx,1):1.F);
+		float colRInc=biome==0?0.F:biome==1?0.F:biome==2?.05F:1.F;
+		float colGInc=biome==0?.6F:biome==1?.1F:biome==2?.02F:.5F;
+		float colBInc=biome==0?1.F:biome==1?.7F:biome==2?.1F:0.F;
+		colR+=colRInc*ratio;colG+=colGInc*ratio;colB+=colBInc*ratio;
+	}
+	colR=colR*.01F*(float)(cy/mapH)+(cy<mapH*.1?(float)(mapH*.1-cy)/mapH:0.F);
+	colG=colG*.01F*(float)(cy/mapH);
+	colB=colB*.01F*(float)(cy/mapH);
 
-	for(int x=0;x<=156;x++)
-		for(int y=0;y<=84;y++)
+	glClearColor(colR,colG,colB,1.F);
+
+	// --- Render Player ---
+	for(size_t i=0;i<16;i+=4)
+	{
+		vertecies[i]=squareVert[i]*.8F+(float)px;
+		vertecies[i+1]=squareVert[i+1]*.8F+(float)py;
+		vertecies[i+2]=squareVert[i+2]*.125F+getTextCoordX(PLAYER);
+		vertecies[i+3]=squareVert[i+3]*.125F+getTextCoordY(PLAYER);
+	}
+
+	// --- Render Map ---
+	for(int x=0;x<=192;x++)
+		for(int y=0;y<=108;y++)
 			for(size_t i=0;i<16;i+=4)
 			{
-				size_t idx=(y*157+x)*16+i;
-				char mapTy=*getMap(x-78+(int)round(cx),y-42+(int)round(cy));
-				vertecies[idx]=mapTy?squareVert[i]+x+(float)round(cx)-78.F:0;
-				vertecies[idx+1]=mapTy?squareVert[i+1]+y+(float)round(cy)-42.F:0;
+				size_t idx=(y*193+x)*16+i+16;
+				char mapTy=*getMap(x-96+(int)round(cx),y-54+(int)round(cy));
+				vertecies[idx]=mapTy?squareVert[i]+x+(float)round(cx)-96.F:0;
+				vertecies[idx+1]=mapTy?squareVert[i+1]+y+(float)round(cy)-54.F:0;
 				vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
 				vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
 			}
+	
+	// --- Render Bomb ---
 	for(int x=0;x<bombLen;x++)
 		for(size_t i=0;i<16;i+=4)
 		{
 			//printf("BRUH");
-			size_t idx=(scSize+x)*16+i;
+			size_t idx=(scSize+x)*16+i+16;
 			char mapTy=bombs[x].type;
 			vertecies[idx]=squareVert[i]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:bombs[x].fuse*.05F))+(bombs[x].xPos+(bombs[x].xPos>cx+mapW*.5?-mapW:bombs[x].xPos<cx-mapW*.5?mapW:0));
 			vertecies[idx+1]=squareVert[i+1]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:bombs[x].fuse*.05F))+(float)bombs[x].yPos;
@@ -85,7 +115,28 @@ static inline void update()
 	for(int x=bombLen;x<bombMaxLen;x++)
 		for(size_t i=0;i<16;i+=4)
 		{
-			size_t idx=(scSize+x)*16+i;
+			size_t idx=(scSize+x)*16+i+16;
+			vertecies[idx]=0.F;
+			vertecies[idx+1]=0.F;
+			vertecies[idx+2]=0.F;
+			vertecies[idx+3]=0.F;
+		}
+
+	// --- Render Particles --- 
+	for(int x=0;x<particleLen;x++)
+		for(size_t i=0;i<16;i+=4)
+		{
+			size_t idx=((scSize+bombMaxLen)+x)*16+i+16;
+			char mapTy=particles[x].type;
+			vertecies[idx]=cos(particles[x].rotation+(i==0?0.:i==4?1.5707963267948966192313216916398:i==12?3.1415926535897932384626433832795:4.7123889803846898576939650749193))*0.00471404520791031682933896241403*(particles[x].despawnTime>150?150:particles[x].despawnTime)+particles[x].xPos; // i * ((PI * 2) / 16) and sin(45)
+			vertecies[idx+1]=sin(particles[x].rotation+(i==0?0.:i==4?1.5707963267948966192313216916398:i==12?3.1415926535897932384626433832795:4.7123889803846898576939650749193))*0.00471404520791031682933896241403*(particles[x].despawnTime>150?150:particles[x].despawnTime)+particles[x].yPos; // i * ((PI * 2) / 16)
+			vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
+			vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
+		}
+	for(int x=particleLen;x<particleMaxLen;x++)
+		for(size_t i=0;i<16;i+=4)
+		{
+			size_t idx=((scSize+bombMaxLen)+x)*16+i+16;
 			vertecies[idx]=0.F;
 			vertecies[idx+1]=0.F;
 			vertecies[idx+2]=0.F;
@@ -144,7 +195,8 @@ int main(int argc,char**argv)
 	timeBef=clock();
 
 	//Generate Plattrym
-	generateMapNormal(2000,2000,600,1300,30,41,25,51);
+	generateMapNormal(2000,2000,600,1300,30,41,25,71);
+	initPlayer();
 
 	while(!glfwWindowShouldClose(window))
 	{
@@ -154,7 +206,6 @@ int main(int argc,char**argv)
 		timeBef=curTime;
 
 		update();
-		glClearColor(0,0,1,1.F);
 		glClear(GL_COLOR_BUFFER_BIT);
 		
 		//Buffer sub datas

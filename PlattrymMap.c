@@ -3,8 +3,8 @@
 #define __PLATTRYM_MAP__
 
 
-int mapW,mapH;
-char*map,isMallocedMap=0;
+int mapW,mapH,*mapHeights;
+char*map,*biomes,isMallocedMap=0;
 #define AIR 0
 #define GRASS 1
 #define DIRT 2
@@ -73,9 +73,15 @@ static inline void mallocMap(uint mapWidth,uint mapHeight)
 {
 	srand(clock());
 	if(isMallocedMap)
-		isMallocedMap=0,free(map);
+		isMallocedMap=0,free(map),free(biomes),free(mapHeights);
 	map=(char*)malloc(mapWidth*mapHeight+1);
+	biomes=(char*)malloc(mapWidth);
+	mapHeights=(int*)malloc(sizeof(int)*mapWidth);
+
 	memset(map,0,mapWidth*mapHeight+1);
+	memset(biomes,0,mapWidth);
+	memset(mapHeights,0,sizeof(int)*mapWidth);
+
 	mapW=mapWidth,mapH=mapHeight;
 	isMallocedMap=1;
 }
@@ -89,18 +95,13 @@ static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSp
 	int curHeightCh=0;
 	char mapType=rand()%4;
 
-	int*mapHeights=(int*)malloc(sizeof(int)*mapWidth);
-	memset(mapHeights,0,sizeof(int)*mapWidth);
-	char*biomes=(char*)malloc(mapWidth);
-	memset(mapHeights,0,mapWidth);
-
 	for(uint x=0;x<mapWidth/2;x++)
 	{
 		if(rand()%99==0)
 			mapType=rand()%4;
 		if(curHeight>(mapType==1?-151:mapType==2?124:-1))
 			curHeight=mapType==1?-151:mapType==2?124:-1,curHeightCh=-1;
-		curHeightCh=(curHeightCh<0?-1:curHeightCh==0?rand()?1:-1:1)*(rand()%(abs(curHeightCh)+(mapType==2?5:2))==0?abs(curHeightCh)+1:abs(curHeightCh)-1);
+		curHeightCh=(curHeightCh<0?-1:curHeightCh==0?rand()%2?1:-1:1)*(rand()%(abs(curHeightCh)+(mapType==2?5:2))==0?abs(curHeightCh)+1:abs(curHeightCh)-1);
 		curHeight+=curHeightCh*(mapType==1?3:1);
 		mapHeights[x]=curHeight+(mapType==1?150:mapType==2?-125:0);
 		biomes[x]=mapType;
@@ -154,8 +155,8 @@ static inline void generateMapNormal(uint mapWidth,uint mapHeight,uint diamondSp
 		}
 	}
 
-	free(mapHeights);
-	free(biomes);
+	for(int i=0;i<mapW;i++)
+		mapHeights[i]=mapH+mapHeights[i];
 }
 
 #endif

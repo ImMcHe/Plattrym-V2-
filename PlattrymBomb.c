@@ -80,22 +80,20 @@ static inline void destroy(int xOg,int yOg,int xPos,int yPos,float*power,float d
 	float blr=getBlr(*mapPos);
 	if(*power>blr)
 	{
+		double dist=sqrt((xOg-xPos)*(xOg-xPos)+(yOg-yPos)*(yOg-yPos));
+		dist=dist<.7?.7:dist;
+
+		int pw=(int)ceil(*power*3.F);
+		if(pw>72)
+			pw=1;
+
+		if(((xPos-(int)round(px))%mapW+mapW)%mapW==0&&yPos==(int)round(py))
+			velX+=max(.5,*power*.05F/dist*(fmod(fmod(px,mapW)+mapW,mapW)<xOg?-1:1)),
+			velY+=max(.5,*power*.05F/dist*(py<yOg?-1:1));
+
 		if(*mapPos&&particleLen<particleMaxLen)
 		{
-			double dist=sqrt((xOg-xPos)*(xOg-xPos)+(yOg-yPos)*(yOg-yPos));
-			dist=dist<.7?.7:dist;
-
-			int pw=(int)ceil(*power*3.F);
-			if(pw>72)
-				pw=1;
-
-			if(xPos-(int)round(px))
-				velX+=*power*.1F/dist*(px<xPos?-1:1);
-			if(yPos==(int)round(py))
-				velY+=*power*.1F/dist*(py<yPos?-1:1);
-
-			int newxPos=(xPos>cx+mapW*.5?xPos-mapW:xPos<cx-mapW*.5?xPos+mapW:xPos);
-			if(abs((int)round(newxPos-cx)%mapW)<80&&abs(yPos-cy)<50.)
+			if(abs((int)round((xPos>cx+mapW*.5?xPos-mapW:xPos<cx-mapW*.5?xPos+mapW:xPos)-cx)%mapW)<80&&abs(yPos-cy)<50.)
 				for(int i=0;i<pw;i++)
 					if(particleLen<particleMaxLen)
 						particles[particleLen++]=spawnParticle(*mapPos,rand()/(double)RAND_MAX*.1-.05,*power*.1F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.1F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,rand()%750+250);
@@ -176,9 +174,13 @@ static inline void bombUpdate()
 		bombs[bombLen++]=spawnBomb(
 			(randChance<46.?SMALLBOMB:randChance<77.?MIDBOMB:BIGBOMB),
 			width,
-			mapHeights[width]+250
+			max(mapHeights[width],py)+250
 		);
 	}
+
+	if(getKeyDown(GLFW_KEY_SPACE)&&bombLen<bombMaxLen)
+		bombs[bombLen++]=spawnBomb(ABOMB,((int)round(px)%mapW+mapW)%mapW,py+10.);
+
 	if((rand()==0)&&bombLen<bombMaxLen)
 	{
 		int width=rand()/(double)RAND_MAX*mapW;
@@ -186,7 +188,7 @@ static inline void bombUpdate()
 		bombs[bombLen++]=spawnBomb(
 			ABOMB,
 			width,
-			mapHeights[width]+1000
+			max(mapHeights[width],py)+1000
 		);
 	}
 	

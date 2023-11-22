@@ -90,18 +90,18 @@ static inline void move()
 	if(isT||(keyLeft^keyRight))
 		velX*=.93;
 	else
-		velX*=.992;
+		velX*=.995;
 
-	scx=(scx-px)*.9971+px;
-	scy=(scy-py)*.9971+py;
+	scx=(scx-px)*.9981+px;
+	scy=(scy-py)*.9981+py;
 	
 	scy=2*py-scy;
 	scx=2*px-scx;
 
 	scy+=7.;
 
-	cx=(cx-scx)*.996+scx;
-	cy=(cy-scy)*.996+scy;
+	cx=(cx-scx)*.997+scx;
+	cy=(cy-scy)*.997+scy;
 }
 
 

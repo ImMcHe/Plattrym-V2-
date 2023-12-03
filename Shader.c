@@ -5,6 +5,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+
 static inline const char*getFile(const char*fname)
 {
 	FILE*file=fopen(fname,"r");
@@ -74,7 +75,10 @@ static inline uint initShaders()
 	//make the window FIT IN.
 	scaleLocation=glGetUniformLocation(pgm,"sg");
 	positionLocation=glGetUniformLocation(pgm,"ps");
-	glUniform2f(glGetUniformLocation(pgm,"sc"),isXBigger?ydx:1.F,isXBigger?1.F:xdy);
+	redFactor=glGetUniformLocation(pgm,"rf");
+	sc1=isXBigger?ydx:1.F;
+	sc2=isXBigger?1.F:xdy;
+	glUniform2f(glGetUniformLocation(pgm,"sc"),sc1,sc2);
 
 	return pgm;
 }

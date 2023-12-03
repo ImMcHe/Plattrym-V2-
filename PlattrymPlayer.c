@@ -7,6 +7,12 @@
 char keyLeft,keyRight,keyUp;
 
 
+static inline void quit()
+{
+	glfwSetWindowShouldClose(window,1);
+}
+
+
 static inline char getTouch()
 {
 	double pxP=fmod(px,1);
@@ -90,7 +96,7 @@ static inline void move()
 	if(isT||(keyLeft^keyRight))
 		velX*=.93;
 	else
-		velX*=.995;
+		velX*=.998;
 
 	scx=(scx-px)*.9981+px;
 	scy=(scy-py)*.9981+py;
@@ -115,6 +121,13 @@ static inline void fixedUpdate()
 		px+=mapW,cx+=mapW,scx+=mapW;
 
 	bombUpdate();
+
+	health+=pow(regen,3.5)*.0000001;
+	if(health>100.)
+	{
+		health=100.;regen=0.;
+	}
+	regen+=.002;
 }
 
 
@@ -130,7 +143,6 @@ static inline void playerUpdate(double deltaTime)
 	for(int i=0;i<numOfTimes;i++)
 		fixedUpdate();
 
-	prevDeltaTime=fmod(prevDeltaTime,1);
 }
 
 

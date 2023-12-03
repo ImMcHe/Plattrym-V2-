@@ -1,4 +1,3 @@
-#include<stdio.h>
 #include<time.h>
 #include<conio.h>
 #include<math.h>
@@ -18,8 +17,9 @@ const uint squareInd[]={
 	0,1,2,1,3,2
 };
 #define scSize 21037
-uint scaleLocation,positionLocation;
+uint scaleLocation,positionLocation,redFactor,cameraRotation;
 float*vertecies;
+float dist;
 
 double deltaTime;
 clock_t timeBef;
@@ -39,10 +39,11 @@ const float width=1920/1920.F,height=1080/1920.F;
 #define getKeyDown(__keyCode__)(glfwGetKey(window,__keyCode__)==GLFW_PRESS)
 
 
+size_t sz;
 #include"Plattrym.c"
+#include"UI.c"
 
 
-const size_t sz=1+scSize+bombMaxLen+particleMaxLen+powerUpMaxLen;
 #include"Shader.c"
 #include"Buffer.c"
 #include"Texture.c"
@@ -50,12 +51,15 @@ const size_t sz=1+scSize+bombMaxLen+particleMaxLen+powerUpMaxLen;
 
 static inline void update()
 {
-	playerUpdate(!getKeyDown(GLFW_KEY_K)?deltaTime*.01:deltaTime);
+	//double newD=getKeyDown(GLFW_KEY_K)?deltaTime*100.:getKeyDown(GLFW_KEY_J)?deltaTime*.05:deltaTime;
+	double newD=deltaTime;
+	playerUpdate(newD);
 
-	float dist=pow((cx-scx)*(cx-scx)+(cy-scy)*(cy-scy)+49.,.3)*.06+1.;
-	glUniform2f(scaleLocation,-.03F/dist,.03F/dist);
+	dist=.03F/(pow((cx-scx)*(cx-scx)+(cy-scy)*(cy-scy)+49.,.3)*.06+1.);
+	glUniform2f(scaleLocation,-dist,dist);
 	//glUniform2f(scaleLocation,-.01F,.01F);
 	glUniform2f(positionLocation,-cx,-cy);
+	glUniform1f(redFactor,red);
 
 	// --- Clear Color ---
 	float colR=0.F,colG=0.F,colB=0.F;
@@ -64,16 +68,16 @@ static inline void update()
 		//printf("%i\n",((i+(int)floor(cx))%mapW+mapW)%mapW);
 		char biome=biomes[((i+(int)floor(cx))%mapW+mapW)%mapW];
 		float ratio=(i==-20?fmod(cx,1):i==20?1.-fmod(cx,1):1.F);
-		float colRInc=biome==0?0.F:biome==1?0.F:biome==2?.05F:1.F;
-		float colGInc=biome==0?.6F:biome==1?.1F:biome==2?.02F:.5F;
-		float colBInc=biome==0?1.F:biome==1?.7F:biome==2?.1F:0.F;
+		float colRInc=biome==0?0.F:biome==1?0.F:biome==2?.20F:1.F;
+		float colGInc=biome==0?.6F:biome==1?.1F:biome==2?.08F:.5F;
+		float colBInc=biome==0?1.F:biome==1?.7F:biome==2?.3F:0.F;
 		colR+=colRInc*ratio;colG+=colGInc*ratio;colB+=colBInc*ratio;
 	}
 	colR=colR*.01F*(float)(cy/mapH)+(cy<mapH*.1?(float)(mapH*.1-cy)/mapH:0.F);
 	colG=colG*.01F*(float)(cy/mapH);
 	colB=colB*.01F*(float)(cy/mapH);
 
-	glClearColor(colR,colG,colB,1.F);
+	glClearColor(colR,colG*red,colB*red,1.F);
 
 	// --- Render Player ---
 	for(size_t i=0;i<16;i+=4)
@@ -84,7 +88,36 @@ static inline void update()
 		vertecies[i+3]=squareVert[i+3]*.125F+getTextCoordY(PLAYER);
 	}
 
+	// -- ABomb effect --
+	for(int x=0;x<bombLen;x++)
+		if(bombs[x].type==ABOMB)
+		{
+			int yPos=round(bombs[x].yPos),xPos=(bombs[x].xPos);
+			int newXPos=round(px);
+			if(newXPos<0)
+				newXPos+=mapW;
+			int xDif=newXPos-xPos,yDif=yPos-round(py);
+
+			if(xDif<-mapW/2)
+				xDif+=mapW;
+			else if(xDif>mapW/2)
+				xDif-=mapW;
+
+			if(sqrt(xDif*xDif+yDif*yDif)<250.)
+				for(int x=-120;x<=120;x++)
+					for(int y=-120;y<=120;y++)
+					{
+						char ty=*getMap(x+xPos,y+yPos);
+						char lvl=ABOMBLVL7-round(sqrt(x*x+y*y)/18);
+						if(lvl>ABOMBLVL7||lvl<ABOMBLVL1)
+							lvl=AIR;
+						if(ty==AIR||(ty>=ABOMBLVL1&&ty<=ABOMBLVL7?ty<lvl:0))
+							*getMap(x+xPos,y+yPos)=lvl;
+					}
+		}
+
 	// --- Render Map ---
+	*getMap(0,-1)=AIR;
 	for(int x=0;x<=192;x++)
 		for(int y=0;y<=108;y++)
 			for(size_t i=0;i<16;i+=4)
@@ -104,13 +137,35 @@ static inline void update()
 			//printf("BRUH");
 			size_t idx=(scSize+x)*16+i+16;
 			char mapTy=bombs[x].type;
-			vertecies[idx]=squareVert[i]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:bombs[x].fuse*.05F))+(bombs[x].xPos+(bombs[x].xPos>cx+mapW*.5?-mapW:bombs[x].xPos<cx-mapW*.5?mapW:0));
-			vertecies[idx+1]=squareVert[i+1]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:bombs[x].fuse*.05F))+(float)bombs[x].yPos;
+			vertecies[idx]=squareVert[i]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:pow(bombs[x].fuse,1.2)*.05F))+(bombs[x].xPos+(bombs[x].xPos>cx+mapW*.5?-mapW:bombs[x].xPos<cx-mapW*.5?mapW:0));
+			vertecies[idx+1]=squareVert[i+1]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:pow(bombs[x].fuse,1.2)*.05F))+(float)bombs[x].yPos;
 			//vertecies[idx]=squareVert[i];
 			//vertecies[idx+1]=squareVert[i+1];
 			//printf("%f %f\n",vertecies[idx],vertecies[idx+1]);
 			vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
 			vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
+			if(mapTy==ABOMB)
+			{
+				int yPos=round(bombs[x].yPos),xPos=(bombs[x].xPos);
+				int newXPos=round(px);
+				if(newXPos<0)
+					newXPos+=mapW;
+				int xDif=newXPos-xPos,yDif=yPos-round(py);
+
+				if(xDif<-mapW/2)
+					xDif+=mapW;
+				else if(xDif>mapW/2)
+					xDif-=mapW;
+
+				if(sqrt(xDif*xDif+yDif*yDif)<250.)
+					for(int x=-120;x<=120;x++)
+						for(int y=-120;y<=120;y++)
+						{
+							char ty=*getMap(x+xPos,y+yPos);
+							if(ty>=ABOMBLVL1&&ty<=ABOMBLVL7)
+								*getMap(x+xPos,y+yPos)=AIR;
+						}
+			}
 		}
 	for(int x=bombLen;x<bombMaxLen;x++)
 		for(size_t i=0;i<16;i+=4)
@@ -142,6 +197,11 @@ static inline void update()
 			vertecies[idx+2]=0.F;
 			vertecies[idx+3]=0.F;
 		}
+
+	renderUI(newD);
+
+	if(health<0.F)
+		quit();
 }
 
 
@@ -150,6 +210,7 @@ static inline void update()
 int main(int argc,char**argv)
 {
 	glfwInit();
+	sz=1+scSize+bombMaxLen+particleMaxLen+powerUpMaxLen+uiLen;
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
@@ -171,6 +232,7 @@ int main(int argc,char**argv)
 	gladLoadGL();
 	//Tells opengGL version
 	printf("You are using OpenGL %s\n",glGetString(GL_VERSION));
+	health=100.;
 
 	uint vao,vbo,ebo;
 
@@ -227,4 +289,3 @@ int main(int argc,char**argv)
 
     return 0;
 }
-

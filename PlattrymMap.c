@@ -26,12 +26,19 @@ char*map,*biomes,isMallocedMap=0;
 #define ICEORE 23
 #define VALLEYORE 24
 #define NORMALORE 25
+#define ABOMBLVL1 26
+#define ABOMBLVL2 27
+#define ABOMBLVL3 28
+#define ABOMBLVL4 29
+#define ABOMBLVL5 30
+#define ABOMBLVL6 31
+#define ABOMBLVL7 32
 const float blr[]={
-	.41,
+	.35,
 	2.,
 	1.,
 	1.674,
-	11.24,
+	8.24,
 	2.225,
 	3.6,
 	.01,
@@ -49,13 +56,14 @@ const float blr[]={
 	1.,1.,1.,1.,
 	3.,
 	4.,
-	3.1
+	3.1,
+	.35,.35,.35,.35,.35,.35,.35
 };
 
 
 static inline float getBlr(char type)
 {
-	if(type<26)
+	if(type<33)
 		return blr[type];
 	return 1.F;
 }

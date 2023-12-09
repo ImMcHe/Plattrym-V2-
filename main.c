@@ -52,7 +52,13 @@ size_t sz;
 static inline void update()
 {
 	//double newD=getKeyDown(GLFW_KEY_K)?deltaTime*100.:getKeyDown(GLFW_KEY_J)?deltaTime*.05:deltaTime;
-	double newD=deltaTime;
+	double newD=deltaTime*timeDelFactor;
+
+	if(timeDel>0.)
+		timeDelFactor=max(.4,timeDelFactor-deltaTime*2.);
+	else
+		timeDelFactor=min(1.,timeDelFactor+deltaTime*2.);
+
 	playerUpdate(newD);
 
 	dist=.03F/(pow((cx-scx)*(cx-scx)+(cy-scy)*(cy-scy)+49.,.3)*.06+1.);
@@ -185,6 +191,27 @@ static inline void update()
 			char mapTy=particles[x].type;
 			vertecies[idx]=cos(particles[x].rotation+(i==0?0.:i==4?1.5707963267948966192313216916398:i==12?3.1415926535897932384626433832795:4.7123889803846898576939650749193))*0.00471404520791031682933896241403*(particles[x].despawnTime>150?150:particles[x].despawnTime)+particles[x].xPos; // i * ((PI * 2) / 16) and sin(45)
 			vertecies[idx+1]=sin(particles[x].rotation+(i==0?0.:i==4?1.5707963267948966192313216916398:i==12?3.1415926535897932384626433832795:4.7123889803846898576939650749193))*0.00471404520791031682933896241403*(particles[x].despawnTime>150?150:particles[x].despawnTime)+particles[x].yPos; // i * ((PI * 2) / 16)
+			vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
+			vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
+		}
+	for(int x=particleLen;x<particleMaxLen;x++)
+		for(size_t i=0;i<16;i+=4)
+		{
+			size_t idx=((scSize+bombMaxLen)+x)*16+i+16;
+			vertecies[idx]=0.F;
+			vertecies[idx+1]=0.F;
+			vertecies[idx+2]=0.F;
+			vertecies[idx+3]=0.F;
+		}
+
+	// --- Render Power Up --- 
+	for(int x=0;x<powerUpLen;x++)
+		for(size_t i=0;i<16;i+=4)
+		{
+			size_t idx=((scSize+bombMaxLen+particleMaxLen)+x)*16+i+16;
+			char mapTy=powerUp[x].type;
+			vertecies[idx]=cos(powerUp[x].rotation+(i==0?0.:i==4?1.5707963267948966192313216916398:i==12?3.1415926535897932384626433832795:4.7123889803846898576939650749193))*0.00471404520791031682933896241403*(powerUp[x].despawnTime>150?150:powerUp[x].despawnTime)+powerUp[x].xPos; // i * ((PI * 2) / 16) and sin(45)
+			vertecies[idx+1]=sin(powerUp[x].rotation+(i==0?0.:i==4?1.5707963267948966192313216916398:i==12?3.1415926535897932384626433832795:4.7123889803846898576939650749193))*0.00471404520791031682933896241403*(powerUp[x].despawnTime>150?150:powerUp[x].despawnTime)+powerUp[x].yPos; // i * ((PI * 2) / 16)
 			vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
 			vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
 		}

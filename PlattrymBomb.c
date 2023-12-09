@@ -6,12 +6,20 @@
 #define MIDBOMB 20
 #define BIGBOMB 21
 #define ABOMB 22
+#define HEALTH 33
+#define SHIELD 34
+#define SPEED 35
+#define JUMPBOOST 36
+#define TIMEDEL 37
+#define PINKORB 38
 
-double bombSpawnChance,health,hype,timeDel,scBoost,shield,regen;
+double bombSpawnChance,health=100.,hype,timeDel,scBoost,regen;
+uint aBombSpawnTime=10000;
+char shield;
 #define bombMaxLen 1023
 #define particleMaxLen 12000
 #define powerUpMaxLen 511
-uint bombLen,particleLen;
+uint bombLen,particleLen,powerUpLen;
 float red;
 struct Bomb
 {
@@ -27,7 +35,8 @@ struct Particle
 	double rotation,xPos,yPos,xVel,yVel,rotationSpeed;
 	int despawnTime;
 }
-particles[particleMaxLen];
+particles[particleMaxLen],powerUp[powerUpMaxLen];
+
 
 static inline struct Bomb spawnBomb(char type,int xPos,int yPos)
 {
@@ -90,7 +99,10 @@ static inline void destroy(int xOg,int yOg,int xPos,int yPos,float*power,float d
 
 		if(((xPos-(int)round(px))%mapW+mapW)%mapW==0&&yPos==(int)round(py))
 		{
-			health-=damage**power;
+			if(shield)
+				shield=0;
+			else
+				health-=damage**power;
 			regen=0.;
 			red=0.F;
 			double newPx=fmod(fmod(px,mapW)+mapW,mapW);
@@ -118,6 +130,22 @@ static inline void destroy(int xOg,int yOg,int xPos,int yPos,float*power,float d
 					for(int i=0;i<pw;i++)
 						if(particleLen<particleMaxLen)
 							particles[particleLen++]=spawnParticle(*mapPos,rand()/(double)RAND_MAX*.1-.05,*power*.1F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.1F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,rand()%750+250);
+		}
+		if(*mapPos&&powerUpLen<powerUpMaxLen)
+		{
+			const uint*pusc=powerUpSpawnChances[*mapPos];
+			if(rand()<pusc[0])
+				powerUp[powerUpLen++]=spawnParticle(HEALTH,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+			if(rand()<pusc[1])
+				powerUp[powerUpLen++]=spawnParticle(SHIELD,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+			if(rand()<pusc[2])
+				powerUp[powerUpLen++]=spawnParticle(SPEED,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+			if(rand()<pusc[3])
+				powerUp[powerUpLen++]=spawnParticle(JUMPBOOST,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+			if(rand()<pusc[4])
+				powerUp[powerUpLen++]=spawnParticle(TIMEDEL,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+			if(rand()<pusc[5])
+				powerUp[powerUpLen++]=spawnParticle(PINKORB,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
 		}
 		*power-=blr*multiplyer;
 		*mapPos=AIR;
@@ -218,8 +246,10 @@ static inline void bombUpdate()
 
 	//char bruh=(getKeyDown(GLFW_KEY_SPACE));
 	char bruh=0;
-	if((rand()<2||bruh)&&bombLen<bombMaxLen)
+	if((aBombSpawnTime<0)&&bombLen<bombMaxLen)
 	{
+		aBombSpawnTime=6000;
+		printf("An A Bomb has Spawned");
 		int width=rand()*mapW/(double)RAND_MAX;
 
 		bombs[bombLen++]=spawnBomb(
@@ -228,6 +258,7 @@ static inline void bombUpdate()
 			bruh?py+50:max(mapHeights[width],py)+1000
 		);
 	}
+	aBombSpawnTime-=1;
 	
 	for(uint i=0;i<bombLen;i++)
 	{
@@ -272,6 +303,39 @@ static inline void bombUpdate()
 		if(abs((int)round(particles[i].xPos-cx)%mapW)>80||abs(particles[i].yPos-cy)>50.)
 			particles[i].despawnTime-=50;
 	}
+	for(uint i=0;i<powerUpLen;i++)
+	{
+		powerUp[i].yVel-=.0003;
+
+		powerUp[i].xPos+=powerUp[i].xVel;
+		powerUp[i].yPos+=powerUp[i].yVel;
+		powerUp[i].despawnTime--;
+		powerUp[i].rotation+=powerUp[i].rotationSpeed;
+
+		if(*getMap(round(powerUp[i].xPos),round(powerUp[i].yPos)))
+		{
+			char xInt=0,yInt=0;
+			powerUp[i].xPos-=powerUp[i].xVel;
+
+			yInt=*getMap(round(powerUp[i].xPos),round(powerUp[i].yPos));
+
+			powerUp[i].xPos+=powerUp[i].xVel;
+			powerUp[i].yPos-=powerUp[i].yVel;
+
+			xInt=*getMap(round(powerUp[i].xPos),round(powerUp[i].yPos));
+
+			powerUp[i].xPos-=powerUp[i].xVel;
+
+			powerUp[i].xVel=powerUp[i].xVel*.3;
+			powerUp[i].yVel=powerUp[i].yVel*.3;
+			if(xInt)
+				powerUp[i].xVel=-powerUp[i].xVel;
+			if(yInt)
+				powerUp[i].yVel=-powerUp[i].yVel;
+		}
+
+		powerUp[i].xPos=powerUp[i].xPos>cx+mapW*.5?powerUp[i].xPos-mapW:powerUp[i].xPos<cx-mapW*.5?powerUp[i].xPos+mapW:powerUp[i].xPos;
+	}
 
 	int shiftW=0;
 	for(int i=0;i<bombLen;i++)
@@ -293,6 +357,16 @@ static inline void bombUpdate()
 			particles[i-shiftW]=particles[i];
 	}
 	particleLen-=shiftW;
+
+	shiftW=0;
+	for(int i=0;i<powerUpLen;i++)
+	{
+		if(powerUp[i].despawnTime<=0)
+			shiftW++;
+		else if(shiftW)
+			powerUp[i-shiftW]=powerUp[i];
+	}
+	powerUpLen-=shiftW;
 }
 
 #endif

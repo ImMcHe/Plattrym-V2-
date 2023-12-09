@@ -5,6 +5,7 @@
 #define PLAYER 15
 
 char keyLeft,keyRight,keyUp;
+double timeDelFactor=1.;
 
 
 static inline void quit()
@@ -37,10 +38,33 @@ static inline char getTouch()
 
 static inline void move()
 {
+	for(uint i=0;i<powerUpLen;i++)
+		if((((int)round(px))%mapW+mapW)%mapW==(((int)round(powerUp[i].xPos))%mapW+mapW)%mapW&&(int)round(py)==(int)round(powerUp[i].yPos)&&powerUp[i].despawnTime>150)
+		{
+			powerUp[i].despawnTime=150;
+
+			if(powerUp[i].type==HEALTH)
+				health+=50.;
+			if(powerUp[i].type==SHIELD)
+				shield=1;
+			if(powerUp[i].type==SPEED)
+				hype=100.;
+			if(powerUp[i].type==JUMPBOOST)
+				scBoost=100.;
+			if(powerUp[i].type==TIMEDEL)
+				timeDel=100;
+			if(powerUp[i].type==PINKORB)
+			{
+				if(!shield)
+					health+=50.;
+				explode((int)round(px),(int)round(py),MIDBOMB);
+			}
+		}
+
 	if(keyLeft)
-		velX+=.003;
+		velX+=hype?.0045:.003;
 	if(keyRight)
-		velX-=.003;
+		velX-=hype?.0045:.003;
 
 	velY-=.0003;
 
@@ -88,7 +112,7 @@ static inline void move()
 			}
 
 		if(keyUp&&isYt&&isYVelLessThan0)
-			velY=.061;
+			velY=scBoost>0.?.1:.061;
 		
 		px+=velX;
 		py+=velY;
@@ -140,6 +164,17 @@ static inline void playerUpdate(double deltaTime)
 	keyRight=getKeyDown(GLFW_KEY_RIGHT);
 	keyUp=getKeyDown(GLFW_KEY_UP);
 	
+	scBoost-=.006;
+	hype-=.006;
+	timeDel-=.01;
+
+	if(scBoost<0.)
+		scBoost=0.;
+	if(hype<0.)
+		hype=0.;
+	if(timeDel<0.)
+		timeDel=0.;
+
 	for(int i=0;i<numOfTimes;i++)
 		fixedUpdate();
 

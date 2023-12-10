@@ -55,7 +55,7 @@ static inline void update()
 	double newD=deltaTime*timeDelFactor;
 
 	if(timeDel>0.)
-		timeDelFactor=max(.4,timeDelFactor-deltaTime*2.);
+	    timeDelFactor=max(.2,timeDelFactor-deltaTime*2.);
 	else
 		timeDelFactor=min(1.,timeDelFactor+deltaTime*2.);
 
@@ -83,7 +83,7 @@ static inline void update()
 	colG=colG*.01F*(float)(cy/mapH);
 	colB=colB*.01F*(float)(cy/mapH);
 
-	glClearColor(colR,colG*red,colB*red,1.F);
+	glClearColor(colR*red,colG*red,colB*red,1.F);
 
 	// --- Render Player ---
 	for(size_t i=0;i<16;i+=4)

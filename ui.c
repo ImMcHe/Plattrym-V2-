@@ -49,7 +49,7 @@ static inline void fixedUI()
 	else
 		speedDrop=min(0.5F,speedDrop+.001F);
 
-	red+=.01F;
+	red+=.003F;
 	if(red>1.F)
 		red=1.F;
 }
@@ -66,11 +66,12 @@ static inline void renderUI(double deltaTime)
 	// -- Render HP -- 
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
-		float sc=(i==12||i==8?1.F:((float)(prevHP))*.02F-1.F);
+		//float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F))-(1.F-red)*(1.F-red);
+		float rad=((i==0?.1F:i==4?3.041592653589793F:i==8?6.18318530718F:3.24159265358F))-(1.F-red)*(1.F-red);
+		float sc=(i==12||i==4?1.F:((float)(prevHP))*.02F-1.F);
 
-		vertecies[i+pos]=wtsX(cos(rad)*sc*.15F);
-		vertecies[i+pos+1]=wtsY(sin(rad)*.015F-.9F-hpDrop*hpDrop);
+		vertecies[i+pos]=wtsX(cos(rad)*sc*.13F);
+		vertecies[i+pos+1]=wtsY(sin(rad)*.13F-.9F-hpDrop*hpDrop);
 		int b=abs(prevHP-health);
 		vertecies[i+pos+2]=b<7?.8515625F:0.8984375F;
 		vertecies[i+pos+3]=b<7?0.671875F:0.859375F;
@@ -78,10 +79,10 @@ static inline void renderUI(double deltaTime)
 	pos-=16;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?.1F:i==4?3.041592653589793F:i==8?6.18318530718F:3.24159265358F))-(1.F-red)*(1.F-red);
 
-		vertecies[i+pos]=wtsX(cos(rad)*.157F);
-		vertecies[i+pos+1]=wtsY(sin(rad)*.022F-.9F-hpDrop*hpDrop);
+		vertecies[i+pos]=wtsX(cos(rad)*.134F);
+		vertecies[i+pos+1]=wtsY(sin(rad)*.16F-.9F-hpDrop*hpDrop);
 		vertecies[i+pos+2]=0.5F;
 		vertecies[i+pos+3]=0.4609375F;
 	}
@@ -91,7 +92,7 @@ static inline void renderUI(double deltaTime)
 	// -- Render Shield -- 
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 		float sc=(i==12||i==8?1.F:((float)(prevShield))*.02F-1.F);
 
 		vertecies[i+pos]=wtsX(cos(rad)*sc*.15F-.8F);
@@ -103,7 +104,7 @@ static inline void renderUI(double deltaTime)
 	pos-=16;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 
 		vertecies[i+pos]=wtsX(cos(rad)*.157F-.8F);
 		vertecies[i+pos+1]=wtsY(sin(rad)*.022F+.9F+shieldDrop*shieldDrop);
@@ -117,7 +118,7 @@ static inline void renderUI(double deltaTime)
 	//double bombSpawnChance,health,hype,timeDel,scBoost,shield,regen;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 		float sc=(i==12||i==8?1.F:((float)(prevSpeed))*.02F-1.F);
 
 		vertecies[i+pos]=wtsX(cos(rad)*sc*.15F-.8F);
@@ -129,7 +130,7 @@ static inline void renderUI(double deltaTime)
 	pos-=16;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 
 		vertecies[i+pos]=wtsX(cos(rad)*.157F-.8F);
 		vertecies[i+pos+1]=wtsY(sin(rad)*.022F-.9F-speedDrop*speedDrop);
@@ -143,7 +144,7 @@ static inline void renderUI(double deltaTime)
 	//double bombSpawnChance,health,hype,timeDel,scBoost,shield,regen;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 		float sc=(i==12||i==8?1.F:((float)(prevJumpBoost))*.02F-1.F);
 
 		vertecies[i+pos]=wtsX(cos(rad)*sc*.15F+.8F);
@@ -155,7 +156,7 @@ static inline void renderUI(double deltaTime)
 	pos-=16;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 
 		vertecies[i+pos]=wtsX(cos(rad)*.157F+.8F);
 		vertecies[i+pos+1]=wtsY(sin(rad)*.022F-.9F-jumpBoostDrop*jumpBoostDrop);
@@ -169,7 +170,7 @@ static inline void renderUI(double deltaTime)
 	//double bombSpawnChance,health,hype,timeDel,scBoost,shield,regen;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 		float sc=(i==12||i==8?1.F:((float)(prevTimeDel))*.02F-1.F);
 
 		vertecies[i+pos]=wtsX(cos(rad)*sc*.15F+.8F);
@@ -181,7 +182,7 @@ static inline void renderUI(double deltaTime)
 	pos-=16;
 	for(size_t i=0;i<16;i+=4)
 	{
-		float rad=(i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575;
+		float rad=((i==0?0.F:i==4?1.5707963267948966192313216915F:i==8?4.7123889803846898576939650745F:3.141592653589793238462643383F)-0.78539816339744830961566084575);
 
 		vertecies[i+pos]=wtsX(cos(rad)*.157F+.8F);
 		vertecies[i+pos+1]=wtsY(sin(rad)*.022F+.9F+timeDelDrop*timeDelDrop);

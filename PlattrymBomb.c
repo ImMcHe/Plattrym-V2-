@@ -135,17 +135,17 @@ static inline void destroy(int xOg,int yOg,int xPos,int yPos,float*power,float d
 		{
 			const uint*pusc=powerUpSpawnChances[*mapPos];
 			if(rand()<pusc[0])
-				powerUp[powerUpLen++]=spawnParticle(HEALTH,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+				powerUp[powerUpLen++]=spawnParticle(HEALTH,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
 			if(rand()<pusc[1])
-				powerUp[powerUpLen++]=spawnParticle(SHIELD,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+				powerUp[powerUpLen++]=spawnParticle(SHIELD,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
 			if(rand()<pusc[2])
-				powerUp[powerUpLen++]=spawnParticle(SPEED,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+				powerUp[powerUpLen++]=spawnParticle(SPEED,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
 			if(rand()<pusc[3])
-				powerUp[powerUpLen++]=spawnParticle(JUMPBOOST,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+				powerUp[powerUpLen++]=spawnParticle(JUMPBOOST,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
 			if(rand()<pusc[4])
-				powerUp[powerUpLen++]=spawnParticle(TIMEDEL,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+				powerUp[powerUpLen++]=spawnParticle(TIMEDEL,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
 			if(rand()<pusc[5])
-				powerUp[powerUpLen++]=spawnParticle(PINKORB,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,60000);
+				powerUp[powerUpLen++]=spawnParticle(PINKORB,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
 		}
 		*power-=blr*multiplyer;
 		*mapPos=AIR;
@@ -246,10 +246,9 @@ static inline void bombUpdate()
 
 	//char bruh=(getKeyDown(GLFW_KEY_SPACE));
 	char bruh=0;
-	if((aBombSpawnTime<0)&&bombLen<bombMaxLen)
+	if((aBombSpawnTime==0U)&&bombLen<bombMaxLen)
 	{
-		aBombSpawnTime=6000;
-		printf("An A Bomb has Spawned");
+		aBombSpawnTime=20000;
 		int width=rand()*mapW/(double)RAND_MAX;
 
 		bombs[bombLen++]=spawnBomb(

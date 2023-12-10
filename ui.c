@@ -37,6 +37,8 @@ static inline void fixedUI()
 	else
 		shieldDrop=min(0.5F,shieldDrop+.001F);
 	if(timeDel>0.F)
+		timeDelDrop=max(0.F,timeDelDrop-.001F);
+	else
 		timeDelDrop=min(0.5F,timeDelDrop+.001F);
 	if(scBoost>0.F)
 		jumpBoostDrop=max(0.F,jumpBoostDrop-.001F);

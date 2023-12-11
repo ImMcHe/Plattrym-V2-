@@ -26,6 +26,7 @@ struct Bomb
 	char type;
 	double yPos;
 	int xPos;
+	float xPosNew;
 	int fuse;
 }
 bombs[bombMaxLen];
@@ -44,6 +45,7 @@ static inline struct Bomb spawnBomb(char type,int xPos,int yPos)
 	bomb.type=type;
 	bomb.xPos=xPos;
 	bomb.yPos=yPos;
+	bomb.xPosNew=xPos;
 	bomb.fuse=-1;
 	return bomb;
 }
@@ -244,15 +246,24 @@ static inline void bombUpdate()
 		);
 	}
 
-	//char bruh=(getKeyDown(GLFW_KEY_SPACE));
+#define DEBUG
+#ifdef DEBUG
+	char bruh=(getKeyDown(GLFW_KEY_SPACE));
+	if((bruh||aBombSpawnTime==0U)&&bombLen<bombMaxLen)
+#else
 	char bruh=0;
 	if((aBombSpawnTime==0U)&&bombLen<bombMaxLen)
+#endif
 	{
 		aBombSpawnTime=20000;
 		int width=rand()*mapW/(double)RAND_MAX;
 
 		bombs[bombLen++]=spawnBomb(
+#ifdef DEBUG
+			MIDBOMB,
+#else
 			ABOMB,
+#endif
 			bruh?round(px):width,
 			bruh?py+50:max(mapHeights[width],py)+1000
 		);
@@ -262,9 +273,25 @@ static inline void bombUpdate()
 	for(uint i=0;i<bombLen;i++)
 	{
 		bombs[i].yPos-=(bombs[i].type==SMALLBOMB?.1:bombs[i].type==MIDBOMB?.09:bombs[i].type==BIGBOMB?.07:.0045);
+		int bee=bombs[i].xPos;
+		if(bombs[i].xPos-bombs[i].xPosNew>mapW/2)
+			bee-=mapW;
+		else if(bombs[i].xPos-bombs[i].xPosNew<-mapW/2)
+			bee+=mapW;
+		bombs[i].xPosNew=fmod(fmod(bee+(bombs[i].xPosNew-bee)*.7F,mapW)+mapW,mapW);
 		if(bombs[i].fuse!=-1)
 			bombs[i].fuse+=1;
-		else if(*getMap(bombs[i].xPos,round(bombs[i].yPos))||(((int)round(px)%mapW+mapW)%mapW==bombs[i].xPos&&(int)round(py)==(int)round(bombs[i].yPos)))
+		else if(*getMap(bombs[i].xPos,round(bombs[i].yPos)))
+		{
+			int rnd=rand()%2?-1:1;
+			if(!*getMap(bombs[i].xPos-rnd,round(bombs[i].yPos))&&bombs[i].type==SMALLBOMB)
+				bombs[i].xPos=((bombs[i].xPos-rnd)%mapW+mapW)%mapW;
+			else if(!*getMap(bombs[i].xPos+rnd,round(bombs[i].yPos))&&bombs[i].type==SMALLBOMB)
+				bombs[i].xPos=((bombs[i].xPos+rnd)%mapW+mapW)%mapW;
+			else
+				bombs[i].fuse=0;
+		}
+		if(((int)round(px)%mapW+mapW)%mapW==bombs[i].xPos&&(int)round(py)==(int)round(bombs[i].yPos)&&bombs[i].fuse==-1)
 			bombs[i].fuse=0;
 	}
 	for(uint i=0;i<particleLen;i++)

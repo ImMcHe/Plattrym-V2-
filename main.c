@@ -143,7 +143,7 @@ static inline void update()
 			//printf("BRUH");
 			size_t idx=(scSize+x)*16+i+16;
 			char mapTy=bombs[x].type;
-			vertecies[idx]=squareVert[i]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:pow(bombs[x].fuse,1.2)*.05F))+(bombs[x].xPos+(bombs[x].xPos>cx+mapW*.5?-mapW:bombs[x].xPos<cx-mapW*.5?mapW:0));
+			vertecies[idx]=squareVert[i]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:pow(bombs[x].fuse,1.2)*.05F))+(bombs[x].xPosNew+(bombs[x].xPosNew>cx+mapW*.5?-mapW:bombs[x].xPosNew<cx-mapW*.5?mapW:0));
 			vertecies[idx+1]=squareVert[i+1]*((mapTy==SMALLBOMB?.5F:mapTy==MIDBOMB?1.F:1.634F)+(bombs[x].fuse==-1?0.F:pow(bombs[x].fuse,1.2)*.05F))+(float)bombs[x].yPos;
 			//vertecies[idx]=squareVert[i];
 			//vertecies[idx+1]=squareVert[i+1];

@@ -164,9 +164,9 @@ static inline void playerUpdate(double deltaTime)
 	keyRight=getKeyDown(GLFW_KEY_RIGHT);
 	keyUp=getKeyDown(GLFW_KEY_UP);
 	
-	scBoost-=.006;
-	hype-=.006;
-	timeDel-=.01;
+	scBoost-=.003;
+	hype-=.003;
+	timeDel-=.005;
 
 	if(scBoost<0.)
 		scBoost=0.;

@@ -165,7 +165,7 @@ static inline void fixedUpdate()
 #ifdef DEBUG
 	health=100.;
 #endif
-	regen+=.002;
+	regen+=.0005F;
 }
 
 

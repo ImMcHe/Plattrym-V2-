@@ -5,7 +5,7 @@
 #include"glad.c"
 #include<GLFW/glfw3.h>
 #define uint unsigned int
-#define DEBUG
+//#define DEBUG
 
 
 GLFWwindow*window;
@@ -86,7 +86,7 @@ static inline void update()
 	colB=colB*.01F*(float)(cy/mapH);
 
 	float colTimeDel=(timeDelFactor-.2)/.8;
-	glUniform1f(distortionFactor,(1.F-colTimeDel)*.002F);
+	glUniform1f(distortionFactor,max((1.F-red)*.006F,(1.F-colTimeDel)*.002F));
 	glClearColor((colR*colTimeDel+(1.F-colTimeDel)*(.05F+(rand()/(float)RAND_MAX*.1F-.05F)))*red,(colG*colTimeDel+(1.F-colTimeDel)*(.1F+(rand()/(float)RAND_MAX*.1F-.05F)))*red,(colB*colTimeDel+(1.F-colTimeDel)*(.4F+(rand()/(float)RAND_MAX*.1F-.05F)))*red,1.F);
 
 	// --- Render Player ---

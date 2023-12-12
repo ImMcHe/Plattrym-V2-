@@ -139,6 +139,17 @@ static inline void fixedUpdate()
 {
 	move();
 
+	scBoost-=.005;
+	hype-=.005;
+	timeDel-=.02;
+	
+	if(scBoost<0.)
+		scBoost=0.;
+	if(hype<0.)
+		hype=0.;
+	if(timeDel<0.)
+		timeDel=0.;
+
 	if(px>mapW*.5)
 		px-=mapW,cx-=mapW,scx-=mapW;
 	if(px<mapW*.5)
@@ -151,6 +162,9 @@ static inline void fixedUpdate()
 	{
 		health=100.;regen=0.;
 	}
+#ifdef DEBUG
+	health=100.;
+#endif
 	regen+=.002;
 }
 
@@ -163,21 +177,9 @@ static inline void playerUpdate(double deltaTime)
 	keyLeft=getKeyDown(GLFW_KEY_LEFT);
 	keyRight=getKeyDown(GLFW_KEY_RIGHT);
 	keyUp=getKeyDown(GLFW_KEY_UP);
-	
-	scBoost-=.003;
-	hype-=.003;
-	timeDel-=.005;
-
-	if(scBoost<0.)
-		scBoost=0.;
-	if(hype<0.)
-		hype=0.;
-	if(timeDel<0.)
-		timeDel=0.;
 
 	for(int i=0;i<numOfTimes;i++)
 		fixedUpdate();
-
 }
 
 

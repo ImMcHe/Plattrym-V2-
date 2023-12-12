@@ -70,8 +70,8 @@ static inline void renderUI(double deltaTime)
 		float rad=((i==0?.1F:i==4?3.041592653589793F:i==8?6.18318530718F:3.24159265358F))-(1.F-red)*(1.F-red);
 		float sc=(i==12||i==4?1.F:((float)(prevHP))*.02F-1.F);
 
-		vertecies[i+pos]=wtsX(cos(rad)*sc*.13F);
-		vertecies[i+pos+1]=wtsY(sin(rad)*.13F-.9F-hpDrop*hpDrop);
+		vertecies[i+pos]=wtsX(cos(rad)*sc*.13F-cos(red*-9.F)*(1.F-red)*(1.F-red)*.4F);
+		vertecies[i+pos+1]=wtsY(sin(rad)*.13F-.9F-hpDrop*hpDrop-sin(red*9.F)*(1.F-red)*(1.F-red)*.4F);
 		int b=abs(prevHP-health);
 		vertecies[i+pos+2]=b<7?.8515625F:0.8984375F;
 		vertecies[i+pos+3]=b<7?0.671875F:0.859375F;
@@ -81,8 +81,8 @@ static inline void renderUI(double deltaTime)
 	{
 		float rad=((i==0?.1F:i==4?3.041592653589793F:i==8?6.18318530718F:3.24159265358F))-(1.F-red)*(1.F-red);
 
-		vertecies[i+pos]=wtsX(cos(rad)*.134F);
-		vertecies[i+pos+1]=wtsY(sin(rad)*.16F-.9F-hpDrop*hpDrop);
+		vertecies[i+pos]=wtsX(cos(rad)*.134F-cos(red*-9.F)*(1.F-red)*(1.F-red)*.4F);
+		vertecies[i+pos+1]=wtsY(sin(rad)*.16F-.9F-hpDrop*hpDrop-sin(red*9.F)*(1.F-red)*(1.F-red)*.4F);
 		vertecies[i+pos+2]=0.5F;
 		vertecies[i+pos+3]=0.4609375F;
 	}

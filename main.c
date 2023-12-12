@@ -5,6 +5,8 @@
 #include"glad.c"
 #include<GLFW/glfw3.h>
 #define uint unsigned int
+#define DEBUG
+
 
 GLFWwindow*window;
 const float squareVert[]={
@@ -215,10 +217,10 @@ static inline void update()
 			vertecies[idx+2]=squareVert[i+2]*.125F+getTextCoordX(mapTy);
 			vertecies[idx+3]=squareVert[i+3]*.125F+getTextCoordY(mapTy);
 		}
-	for(int x=particleLen;x<particleMaxLen;x++)
+	for(int x=powerUpLen;x<powerUpMaxLen;x++)
 		for(size_t i=0;i<16;i+=4)
 		{
-			size_t idx=((scSize+bombMaxLen)+x)*16+i+16;
+			size_t idx=((scSize+bombMaxLen+particleMaxLen)+x)*16+i+16;
 			vertecies[idx]=0.F;
 			vertecies[idx+1]=0.F;
 			vertecies[idx+2]=0.F;

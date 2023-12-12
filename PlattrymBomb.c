@@ -137,15 +137,15 @@ static inline void destroy(int xOg,int yOg,int xPos,int yPos,float*power,float d
 		{
 			const uint*pusc=powerUpSpawnChances[*mapPos];
 			if(rand()<pusc[0])
-				powerUp[powerUpLen++]=spawnParticle(HEALTH,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
+				powerUp[powerUpLen++]=spawnParticle(HEALTH,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,10000);
 			if(rand()<pusc[1])
-				powerUp[powerUpLen++]=spawnParticle(SHIELD,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
+				powerUp[powerUpLen++]=spawnParticle(SHIELD,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,7500);
 			if(rand()<pusc[2])
-				powerUp[powerUpLen++]=spawnParticle(SPEED,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
+				powerUp[powerUpLen++]=spawnParticle(SPEED,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,10000);
 			if(rand()<pusc[3])
-				powerUp[powerUpLen++]=spawnParticle(JUMPBOOST,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
+				powerUp[powerUpLen++]=spawnParticle(JUMPBOOST,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,8000);
 			if(rand()<pusc[4])
-				powerUp[powerUpLen++]=spawnParticle(TIMEDEL,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
+				powerUp[powerUpLen++]=spawnParticle(TIMEDEL,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,12500);
 			if(rand()<pusc[5])
 				powerUp[powerUpLen++]=spawnParticle(PINKORB,rand()%2?-.01:.01,*power*.3F/dist*(xOg<xPos?1.:xOg==xPos?rand()/(double)RAND_MAX*2.-1.:-1.)+rand()/(double)RAND_MAX*.2-.1,*power*.3F/dist*(yOg<yPos?1:-1)+rand()/(double)RAND_MAX*.2-.1,xPos,yPos,5000);
 		}
@@ -246,7 +246,6 @@ static inline void bombUpdate()
 		);
 	}
 
-#define DEBUG
 #ifdef DEBUG
 	char bruh=(getKeyDown(GLFW_KEY_SPACE));
 	if((bruh||aBombSpawnTime==0U)&&bombLen<bombMaxLen)
@@ -260,7 +259,7 @@ static inline void bombUpdate()
 
 		bombs[bombLen++]=spawnBomb(
 #ifdef DEBUG
-			MIDBOMB,
+			ABOMB,
 #else
 			ABOMB,
 #endif
@@ -283,11 +282,16 @@ static inline void bombUpdate()
 			bombs[i].fuse+=1;
 		else if(*getMap(bombs[i].xPos,round(bombs[i].yPos)))
 		{
-			int rnd=rand()%2?-1:1;
-			if(!*getMap(bombs[i].xPos-rnd,round(bombs[i].yPos))&&bombs[i].type==SMALLBOMB)
-				bombs[i].xPos=((bombs[i].xPos-rnd)%mapW+mapW)%mapW;
-			else if(!*getMap(bombs[i].xPos+rnd,round(bombs[i].yPos))&&bombs[i].type==SMALLBOMB)
-				bombs[i].xPos=((bombs[i].xPos+rnd)%mapW+mapW)%mapW;
+			if(bombs[i].type==BIGBOMB||bombs[i].type==ABOMB)
+			{
+				int rnd=rand()%2?-1:1;
+				if(!*getMap(bombs[i].xPos-rnd,round(bombs[i].yPos)))
+					bombs[i].xPos=((bombs[i].xPos-rnd)%mapW+mapW)%mapW;
+				else if(!*getMap(bombs[i].xPos+rnd,round(bombs[i].yPos)))
+					bombs[i].xPos=((bombs[i].xPos+rnd)%mapW+mapW)%mapW;
+				else
+					bombs[i].fuse=0;
+			}
 			else
 				bombs[i].fuse=0;
 		}

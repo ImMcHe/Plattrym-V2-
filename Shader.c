@@ -76,6 +76,7 @@ static inline uint initShaders()
 	scaleLocation=glGetUniformLocation(pgm,"sg");
 	positionLocation=glGetUniformLocation(pgm,"ps");
 	redFactor=glGetUniformLocation(pgm,"rf");
+	distortionFactor=glGetUniformLocation(pgm,"ds");
 	sc1=isXBigger?ydx:1.F;
 	sc2=isXBigger?1.F:xdy;
 	glUniform2f(glGetUniformLocation(pgm,"sc"),sc1,sc2);

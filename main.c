@@ -19,7 +19,7 @@ const uint squareInd[]={
 	0,1,2,1,3,2
 };
 #define scSize 21037
-uint scaleLocation,positionLocation,redFactor,cameraRotation;
+uint scaleLocation,positionLocation,redFactor,distortionFactor;
 float*vertecies;
 float dist;
 
@@ -85,7 +85,9 @@ static inline void update()
 	colG=colG*.01F*(float)(cy/mapH);
 	colB=colB*.01F*(float)(cy/mapH);
 
-	glClearColor(colR*red,colG*red,colB*red,1.F);
+	float colTimeDel=(timeDelFactor-.2)/.8;
+	glUniform1f(distortionFactor,(1.F-colTimeDel)*.002F);
+	glClearColor((colR*colTimeDel+(1.F-colTimeDel)*(.05F+(rand()/(float)RAND_MAX*.1F-.05F)))*red,(colG*colTimeDel+(1.F-colTimeDel)*(.1F+(rand()/(float)RAND_MAX*.1F-.05F)))*red,(colB*colTimeDel+(1.F-colTimeDel)*(.4F+(rand()/(float)RAND_MAX*.1F-.05F)))*red,1.F);
 
 	// --- Render Player ---
 	for(size_t i=0;i<16;i+=4)
@@ -246,7 +248,7 @@ int main(int argc,char**argv)
 	glfwWindowHint(GLFW_OPENGL_PROFILE,GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,1);
 
-	window=glfwCreateWindow(SCREEN_X,SCREEN_Y,"Plattrym (V2)",glfwGetPrimaryMonitor(),NULL);
+	window=glfwCreateWindow(SCREEN_X,SCREEN_Y,"Plattrym (V5)",glfwGetPrimaryMonitor(),NULL);
 
 	printf("Loading Window...\n");
 	if(window==NULL)

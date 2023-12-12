@@ -18,7 +18,7 @@ uint aBombSpawnTime=10000;
 char shield;
 #define bombMaxLen 1023
 #define particleMaxLen 12000
-#define powerUpMaxLen 511
+#define powerUpMaxLen 63
 uint bombLen,particleLen,powerUpLen;
 float red;
 struct Bomb
